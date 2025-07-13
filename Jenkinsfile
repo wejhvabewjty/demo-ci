@@ -30,4 +30,15 @@ pipeline {
             }
         }
     }
+
+    post {
+        always {
+            publishHTML([
+                reportDir: 'target/site',
+                reportFiles: 'checkstyle.html',
+                reportName: 'Checkstyle Report',
+                keepAll: true
+            ])
+        }
+    }
 }
