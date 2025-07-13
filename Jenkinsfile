@@ -7,14 +7,13 @@ pipeline {
     }
 
     environment {
-        GITHUB_USERNAME = 'wejhvabewjty'
-        GITHUB_TOKEN = credentials('github-token')
+        GITHUB_REPO = 'wejhvabewjty/demo-ci'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/wejhvabewjty/demo-ci.git'
+                git branch: 'main', url: "https://github.com/${GITHUB_REPO}.git"
             }
         }
 
@@ -30,21 +29,31 @@ pipeline {
             }
         }
 
-        stage('Code Quality') {
+        stage('Checkstyle') {
             steps {
                 sh 'mvn checkstyle:checkstyle'
             }
         }
 
-        stage('Debug GitHub Credentials') {
-            steps {
-                sh 'echo "Using GitHub user: $GITHUB_USERNAME"'
-            }
-        }
-
         stage('Deploy to GitHub Packages') {
             steps {
-                sh 'mvn deploy -s jenkins/settings.xml'
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
+                    // Creamos el settings.xml con los valores ya sustituidos
+                    writeFile file: 'settings.xml', text: """
+                    <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                            xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                    <servers>
+                        <server>
+                        <id>github</id>
+                        <username>${GITHUB_USERNAME}</username>
+                        <password>${GITHUB_TOKEN}</password>
+                        </server>
+                    </servers>
+                    </settings>
+                    """
+                    sh 'mvn deploy -s settings.xml'
+                }
             }
         }
     }
@@ -52,12 +61,12 @@ pipeline {
     post {
         always {
             publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
                 reportDir: 'target/site',
                 reportFiles: 'checkstyle.html',
-                reportName: 'Checkstyle Report'
+                reportName: 'Checkstyle Report',
+                allowMissing: false,
+                keepAll: true,
+                alwaysLinkToLastBuild: true
             ])
         }
     }
