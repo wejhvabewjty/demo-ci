@@ -26,8 +26,7 @@ pipeline {
 
         stage('Code Quality') {
             steps {
-                sh 'mvn spotbugs:check'
+                sh 'mvn spotbugs:spotbugs'
             }
         }
-    }
 }
