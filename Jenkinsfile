@@ -26,8 +26,7 @@ pipeline {
 
         stage('Code Quality') {
             steps {
-                // Compilar antes de pasar spotbugs para evitar errores
-                sh 'mvn compile spotbugs:spotbugs || true'
+                sh 'mvn checkstyle:checkstyle'
             }
         }
     }
