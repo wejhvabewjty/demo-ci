@@ -6,6 +6,11 @@ pipeline {
         jdk 'JDK21'
     }
 
+    environment {
+        GITHUB_USERNAME = 'wejhvabewjty'
+        GITHUB_TOKEN = credentials('github-token')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -33,9 +38,7 @@ pipeline {
 
         stage('Deploy to GitHub Packages') {
             steps {
-                configFileProvider([configFile(fileId: 'global-settings', variable: 'SETTINGS_XML')]) {
-                    sh 'mvn deploy -s $SETTINGS_XML'
-                }
+                sh 'mvn deploy -s jenkins/settings.xml'
             }
         }
     }
