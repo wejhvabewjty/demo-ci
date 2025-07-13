@@ -6,11 +6,6 @@ pipeline {
         jdk 'JDK21'
     }
 
-    environment {
-        GITHUB_USERNAME = 'wejhvabewjty'
-        GITHUB_TOKEN = credentials('github-token')
-    }
-
     stages {
         stage('Checkout') {
             steps {
