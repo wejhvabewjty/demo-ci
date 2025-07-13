@@ -38,20 +38,21 @@ pipeline {
         stage('Deploy to GitHub Packages') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                    // Creamos el settings.xml con los valores ya sustituidos
-                    writeFile file: 'settings.xml', text: """
+                    sh '''
+                    cat > settings.xml <<EOF
                     <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                             xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
                     <servers>
                         <server>
                         <id>github</id>
-                        <username>${GITHUB_USERNAME}</username>
-                        <password>${GITHUB_TOKEN}</password>
+                        <username>$GITHUB_USERNAME</username>
+                        <password>$GITHUB_TOKEN</password>
                         </server>
                     </servers>
                     </settings>
-                    """
+                    EOF
+                    '''
                     sh 'mvn deploy -s settings.xml'
                 }
             }
