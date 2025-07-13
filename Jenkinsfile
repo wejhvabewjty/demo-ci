@@ -36,6 +36,12 @@ pipeline {
             }
         }
 
+        stage('Debug GitHub Credentials') {
+            steps {
+                sh 'echo "Using GitHub user: $GITHUB_USERNAME"'
+            }
+        }
+
         stage('Deploy to GitHub Packages') {
             steps {
                 sh 'mvn deploy -s jenkins/settings.xml'
