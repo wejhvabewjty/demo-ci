@@ -38,7 +38,9 @@ pipeline {
 
         stage('Deploy to GitHub Packages') {
             steps {
-                sh 'mvn deploy -s $MAVEN_GLOBAL_SETTINGS'
+                configFileProvider([configFile(fileId: 'global-settings', variable: 'SETTINGS_XML')]) {
+                    sh 'mvn deploy -s $SETTINGS_XML'
+                }
             }
         }
     }
